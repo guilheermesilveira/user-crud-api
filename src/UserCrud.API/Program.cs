@@ -1,14 +1,18 @@
+using UserCrud.API.Configuration;
+using UserCrud.Application;
 using UserCrud.Infra.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddApplicationConfig(builder);
+
 builder.Services.AddInfraDataConfig(builder.Configuration);
+
+builder.Services.AddSwaggerConfig();
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -19,6 +23,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("default");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
