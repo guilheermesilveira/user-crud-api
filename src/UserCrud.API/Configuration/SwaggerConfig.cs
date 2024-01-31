@@ -27,7 +27,7 @@ public static class SwaggerConfig
                 c.SwaggerDoc("v1", new OpenApiInfo()
                 {
                     Version = "v1",
-                    Title = "User Management API",
+                    Title = "User CRUD API",
                     Contact = contact,
                     License = license
                 });
