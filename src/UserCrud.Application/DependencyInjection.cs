@@ -10,9 +10,13 @@ public static class DependencyInjection
     public static void AddApplicationConfig(this IServiceCollection services, WebApplicationBuilder builder)
     {
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        
         services.AddAuthConfig(builder);
+        
         services.Configure<ApiBehaviorOptions>(options => options.SuppressModelStateInvalidFilter = true);
+        
         services.AddCorsConfig();
+        
         services.ResolveDependencies();
     }
 }

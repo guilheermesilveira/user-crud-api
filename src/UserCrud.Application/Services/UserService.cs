@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using UserCrud.Application.Contracts.Services;
 using UserCrud.Application.DTOs.User;
 using UserCrud.Application.Notifications;
+using UserCrud.Application.Validations;
 using UserCrud.Domain.Contracts.Repositories;
 using UserCrud.Domain.Models;
 
@@ -26,76 +27,38 @@ public class UserService : IUserService
 
     public async Task<UserDto?> Create(CreateUserDto dto)
     {
-        if (!dto.Validate(out var validationResult))
-        {
-            _notificator.Handle(validationResult.Errors);
+        if (!await ValidationsToCreateUser(dto))
             return null;
-        }
 
-        var getUser = await _userRepository.GetByEmail(dto.Email);
-        if (getUser != null)
-        {
-            _notificator.Handle("Já existe um usuário cadastrado com o email informado.");
-            return null;
-        }
+        var createUser = _mapper.Map<User>(dto);
+        createUser.Password = _passwordHasher.HashPassword(createUser, dto.Password);
 
-        var user = _mapper.Map<User>(dto);
-        user.Password = _passwordHasher.HashPassword(user, dto.Password);
-
-        _userRepository.Create(user);
-        return await CommitChanges() ? _mapper.Map<UserDto>(user) : null;
+        _userRepository.Create(createUser);
+        return await CommitChanges() ? _mapper.Map<UserDto>(createUser) : null;
     }
 
     public async Task<UserDto?> Update(int id, UpdateUserDto dto)
     {
-        var getUser = await _userRepository.GetById(id);
-        if (getUser == null)
-        {
-            _notificator.HandleNotFoundResource();
+        if (!await ValidationsToUpdateUser(id, dto))
             return null;
-        }
 
-        if (!dto.Validate(out var validationResult))
-        {
-            _notificator.Handle(validationResult.Errors);
-            return null;
-        }
+        var updateUser = await _userRepository.GetById(id);
+        MappingToUpdateUser(updateUser!, dto);
 
-        if (!string.IsNullOrEmpty(dto.Name))
-            getUser.Name = dto.Name;
-
-        if (!string.IsNullOrEmpty(dto.Email))
-        {
-            var getUserEmail = await _userRepository.GetByEmail(dto.Email);
-            if (getUserEmail != null)
-            {
-                _notificator.Handle("Já existe um usuário cadastrado com o email informado.");
-                return null;
-            }
-
-            getUser.Email = dto.Email;
-        }
-
-        if (!string.IsNullOrEmpty(dto.Password))
-        {
-            getUser.Password = dto.Password;
-            getUser.Password = _passwordHasher.HashPassword(getUser, dto.Password);
-        }
-
-        _userRepository.Update(getUser);
-        return await CommitChanges() ? _mapper.Map<UserDto>(getUser) : null;
+        _userRepository.Update(updateUser!);
+        return await CommitChanges() ? _mapper.Map<UserDto>(updateUser) : null;
     }
 
     public async Task Delete(int id)
     {
-        var getUser = await _userRepository.GetById(id);
-        if (getUser == null)
+        var deleteUser = await _userRepository.GetById(id);
+        if (deleteUser == null)
         {
             _notificator.HandleNotFoundResource();
             return;
         }
 
-        _userRepository.Delete(getUser);
+        _userRepository.Delete(deleteUser);
         await CommitChanges();
     }
 
@@ -125,12 +88,87 @@ public class UserService : IUserService
         return _mapper.Map<List<UserDto>>(getUserList);
     }
 
+    private async Task<bool> ValidationsToCreateUser(CreateUserDto dto)
+    {
+        var user = _mapper.Map<User>(dto);
+        var userValidator = new ValidatorToCreateUser();
+
+        var validationResult = await userValidator.ValidateAsync(user);
+        if (!validationResult.IsValid)
+        {
+            _notificator.Handle(validationResult.Errors);
+            return false;
+        }
+
+        var existingUserByEmail = await _userRepository.GetByEmail(user.Email);
+        if (existingUserByEmail != null)
+        {
+            _notificator.Handle("Já existe um usuário cadastrado com o email informado.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task<bool> ValidationsToUpdateUser(int id, UpdateUserDto dto)
+    {
+        var existingUserById = await _userRepository.GetById(id);
+        if (existingUserById == null)
+        {
+            _notificator.HandleNotFoundResource();
+            return false;
+        }
+
+        var user = _mapper.Map<User>(dto);
+        var userValidator = new ValidatorToUpdateUser();
+
+        var validationResult = await userValidator.ValidateAsync(user);
+        if (!validationResult.IsValid)
+        {
+            _notificator.Handle(validationResult.Errors);
+            return false;
+        }
+
+        if (!string.IsNullOrEmpty(user.Email))
+        {
+            var existingUserByEmail = await _userRepository.GetByEmail(user.Email);
+            if (existingUserByEmail != null)
+            {
+                _notificator.Handle("Já existe um usuário cadastrado com o email informado.");
+                return false;
+            }
+        }
+
+        if (string.IsNullOrEmpty(user.Name) && string.IsNullOrEmpty(user.Email) && string.IsNullOrEmpty(user.Password))
+        {
+            _notificator.Handle("Nenhum campo fornecido para atualização.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void MappingToUpdateUser(User user, UpdateUserDto dto)
+    {
+        if (!string.IsNullOrEmpty(dto.Name))
+            user.Name = dto.Name;
+
+        if (!string.IsNullOrEmpty(dto.Email))
+            user.Email = dto.Email;
+
+        if (!string.IsNullOrEmpty(dto.Password))
+        {
+            user.Password = dto.Password;
+            user.Password = _passwordHasher.HashPassword(user, dto.Password);
+        }
+    }
+
     private async Task<bool> CommitChanges()
     {
         if (await _userRepository.UnitOfWork.Commit())
             return true;
 
-        _notificator.Handle("Ocorreu um erro ao salvar as alterações!");
+        _notificator.Handle("Ocorreu um erro ao salvar as alterações.");
         return false;
     }
 }

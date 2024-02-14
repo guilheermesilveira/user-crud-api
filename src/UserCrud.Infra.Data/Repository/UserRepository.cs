@@ -34,12 +34,12 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetById(int id)
     {
-        return await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<User?> GetByEmail(string email)
     {
-        return await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
+        return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<List<User>> GetAll()

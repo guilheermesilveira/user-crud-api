@@ -11,7 +11,7 @@ using UserCrud.Infra.Data.Context;
 namespace UserCrud.Infra.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240131174619_AddUserMapping")]
+    [Migration("20240214192723_AddUserMapping")]
     partial class AddUserMapping
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
