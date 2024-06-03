@@ -17,7 +17,7 @@ public static class DependencyConfig
             .AddScoped<IPasswordHasher<User>, Argon2PasswordHasher<User>>();
 
         services
-            .AddScoped<IAdministratorService, AdministratorService>()
+            .AddScoped<IAuthService, AuthService>()
             .AddScoped<IUserService, UserService>();
     }
 }

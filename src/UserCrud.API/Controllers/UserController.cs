@@ -19,9 +19,10 @@ public class UserController : MainController
     }
 
     [HttpPost]
-    [SwaggerOperation("Create a user")]
+    [SwaggerOperation(Summary = "Criar um usuário.", Tags = new[] { "Administração - Usuários" })]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
     {
         var createUser = await _userService.Create(dto);
@@ -29,9 +30,10 @@ public class UserController : MainController
     }
 
     [HttpPut("{id}")]
-    [SwaggerOperation("Update a user")]
+    [SwaggerOperation(Summary = "Atualizar um usuário.", Tags = new[] { "Administração - Usuários" })]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto dto)
     {
@@ -40,8 +42,9 @@ public class UserController : MainController
     }
 
     [HttpDelete("{id}")]
-    [SwaggerOperation("Delete a user")]
+    [SwaggerOperation(Summary = "Deletar um usuário.", Tags = new[] { "Administração - Usuários" })]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
@@ -49,9 +52,10 @@ public class UserController : MainController
         return CustomResponse();
     }
 
-    [HttpGet("{id}")]
-    [SwaggerOperation("Get by id a user")]
+    [HttpGet("Obter-Por-Id/{id}")]
+    [SwaggerOperation(Summary = "Obter um usuário pelo id.", Tags = new[] { "Administração - Usuários" })]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(int id)
     {
@@ -59,9 +63,10 @@ public class UserController : MainController
         return CustomResponse(getUser);
     }
 
-    [HttpGet("GetByEmail/{email}")]
-    [SwaggerOperation("Get by email a user")]
+    [HttpGet("Obter-Por-Email/{email}")]
+    [SwaggerOperation(Summary = "Obter um usuário pelo email.", Tags = new[] { "Administração - Usuários" })]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByEmail(string email)
     {
@@ -69,9 +74,10 @@ public class UserController : MainController
         return CustomResponse(getUser);
     }
 
-    [HttpGet("GetAll")]
-    [SwaggerOperation("Get all users")]
+    [HttpGet("Obter-Todos")]
+    [SwaggerOperation(Summary = "Obter todos os usuários.", Tags = new[] { "Administração - Usuários" })]
     [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetAll()
     {
         var getUserList = await _userService.GetAll();

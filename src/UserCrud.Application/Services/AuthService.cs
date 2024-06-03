@@ -4,35 +4,35 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using UserCrud.Application.Contracts.Services;
-using UserCrud.Application.DTOs.Administrator;
+using UserCrud.Application.DTOs.Auth;
 using UserCrud.Application.Notifications;
 
 namespace UserCrud.Application.Services;
 
-public class AdministratorService : IAdministratorService
+public class AuthService : IAuthService
 {
     private readonly INotificator _notificator;
     private readonly IConfiguration _configuration;
 
-    public AdministratorService(INotificator notificator, IConfiguration configuration)
+    public AuthService(INotificator notificator, IConfiguration configuration)
     {
         _notificator = notificator;
         _configuration = configuration;
     }
 
-    public AdministratorTokenDto? Login(AdministratorLoginDto dto)
+    public TokenDto? Login(LoginDto dto)
     {
-        var tokenLogin = _configuration["Jwt:Login"];
-        var tokenPassword = _configuration["Jwt:Password"];
+        var name = _configuration["Jwt:Name"];
+        var password = _configuration["Jwt:Password"];
 
-        if (dto.Login == tokenLogin && dto.Password == tokenPassword)
+        if (dto.Name == name && dto.Password == password)
             return GenerateToken();
 
-        _notificator.Handle("Login e/ou senha estão incorretos.");
+        _notificator.Handle("Nome e/ou senha estão incorretos.");
         return null;
     }
 
-    private AdministratorTokenDto GenerateToken()
+    private TokenDto GenerateToken()
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -43,16 +43,15 @@ public class AdministratorService : IAdministratorService
             Subject = new ClaimsIdentity(new Claim[]
             {
                 new(ClaimTypes.Role, "User"),
-                new(ClaimTypes.Name, _configuration["Jwt:Login"])
+                new(ClaimTypes.Name, _configuration["Jwt:Name"])
             }),
-            SigningCredentials =
-                new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             Expires = DateTime.UtcNow.AddHours(int.Parse(_configuration["Jwt:HoursToExpire"]))
         });
 
         var encodedToken = tokenHandler.WriteToken(token);
 
-        return new AdministratorTokenDto
+        return new TokenDto
         {
             Token = encodedToken
         };
