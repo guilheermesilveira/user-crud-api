@@ -26,6 +26,6 @@ O projeto está dividido nas seguintes camadas: API, Application, Domain, Infra.
 9. Utilize um sistema gerenciador de banco de dados como o MySQL Workbench.
 10. Certifique-se de que o Entity Framework Core Tools está instalado. Caso não esteja, instale com o comando: ``dotnet tool install --global dotnet-ef``.
 11. Aplique as migrações do Entity Framework Core para atualizar o banco de dados. Utilize o comando: ``dotnet ef database update``.
-12. Abra o terminal e navegue até a pasta Biblioteca.API.
+12. Abra o terminal e navegue até a pasta UserCrud.API.
 13. Execute o comando ``dotnet run`` para iniciar a aplicação.
 14. Acesse a API documentada pelo Swagger.
