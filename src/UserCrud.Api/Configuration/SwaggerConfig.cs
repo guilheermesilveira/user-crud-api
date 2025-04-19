@@ -1,6 +1,6 @@
 using Microsoft.OpenApi.Models;
 
-namespace UserCrud.API.Configuration;
+namespace UserCrud.Api.Configuration;
 
 public static class SwaggerConfig
 {

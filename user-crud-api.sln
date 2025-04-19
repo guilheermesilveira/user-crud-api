@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserCrud.Infra.Data", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserCrud.Application", "src\UserCrud.Application\UserCrud.Application.csproj", "{7E84F508-780A-4493-9023-6C27C500F5E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserCrud.API", "src\UserCrud.API\UserCrud.API.csproj", "{2A341AE3-DEA1-4256-9A96-29064D330581}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserCrud.Api", "src\UserCrud.Api\UserCrud.Api.csproj", "{2A341AE3-DEA1-4256-9A96-29064D330581}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

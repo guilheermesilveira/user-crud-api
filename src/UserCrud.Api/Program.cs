@@ -1,4 +1,4 @@
-using UserCrud.API.Configuration;
+using UserCrud.Api.Configuration;
 using UserCrud.Application;
 using UserCrud.Infra.Data;
 

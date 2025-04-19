@@ -1,10 +1,10 @@
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using UserCrud.API.Responses;
+using UserCrud.Api.Responses;
 using UserCrud.Application.Notifications;
 
-namespace UserCrud.API.Controllers;
+namespace UserCrud.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]

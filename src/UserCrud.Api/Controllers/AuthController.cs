@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using UserCrud.API.Responses;
+using UserCrud.Api.Responses;
 using UserCrud.Application.Contracts.Services;
 using UserCrud.Application.DTOs.Auth;
 using UserCrud.Application.Notifications;
 
-namespace UserCrud.API.Controllers;
+namespace UserCrud.Api.Controllers;
 
 public class AuthController : MainController
 {

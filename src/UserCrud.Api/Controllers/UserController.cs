@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using UserCrud.API.Responses;
+using UserCrud.Api.Responses;
 using UserCrud.Application.Contracts.Services;
 using UserCrud.Application.DTOs.User;
 using UserCrud.Application.Notifications;
 
-namespace UserCrud.API.Controllers;
+namespace UserCrud.Api.Controllers;
 
 [Authorize]
 public class UserController : MainController

@@ -1,4 +1,4 @@
-namespace UserCrud.API.Responses;
+namespace UserCrud.Api.Responses;
 
 public class BadRequestResponse
 {
