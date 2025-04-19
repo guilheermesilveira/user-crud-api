@@ -28,7 +28,7 @@ public class AuthService : IAuthService
         if (dto.Name == name && dto.Password == password)
             return GenerateToken();
 
-        _notificator.Handle("Nome e/ou senha estão incorretos.");
+        _notificator.Handle("Name and/or password are incorrect");
         return null;
     }
 

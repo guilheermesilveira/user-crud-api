@@ -27,46 +27,46 @@ public class UserService : IUserService
 
     public async Task<UserDto?> Create(CreateUserDto dto)
     {
-        if (!await ValidationsToCreateUser(dto))
+        if (!await ValidationsToCreate(dto))
             return null;
 
-        var createUser = _mapper.Map<User>(dto);
-        createUser.Password = _passwordHasher.HashPassword(createUser, dto.Password);
+        var user = _mapper.Map<User>(dto);
+        user.Password = _passwordHasher.HashPassword(user, dto.Password);
+        _userRepository.Create(user);
 
-        _userRepository.Create(createUser);
-        return await CommitChanges() ? _mapper.Map<UserDto>(createUser) : null;
+        return await CommitChanges() ? _mapper.Map<UserDto>(user) : null;
     }
 
     public async Task<UserDto?> Update(int id, UpdateUserDto dto)
     {
-        if (!await ValidationsToUpdateUser(id, dto))
+        if (!await ValidationsToUpdate(id, dto))
             return null;
 
-        var updateUser = await _userRepository.GetById(id);
-        MappingToUpdateUser(updateUser!, dto);
+        var user = await _userRepository.GetById(id);
+        MappingToUpdate(user!, dto);
+        _userRepository.Update(user!);
 
-        _userRepository.Update(updateUser!);
-        return await CommitChanges() ? _mapper.Map<UserDto>(updateUser) : null;
+        return await CommitChanges() ? _mapper.Map<UserDto>(user) : null;
     }
 
     public async Task Delete(int id)
     {
-        var deleteUser = await _userRepository.GetById(id);
-        if (deleteUser == null)
+        var user = await _userRepository.GetById(id);
+        if (user == null)
         {
             _notificator.HandleNotFoundResource();
             return;
         }
 
-        _userRepository.Delete(deleteUser);
+        _userRepository.Delete(user);
         await CommitChanges();
     }
 
     public async Task<UserDto?> GetById(int id)
     {
-        var getUser = await _userRepository.GetById(id);
-        if (getUser != null)
-            return _mapper.Map<UserDto>(getUser);
+        var user = await _userRepository.GetById(id);
+        if (user != null)
+            return _mapper.Map<UserDto>(user);
 
         _notificator.HandleNotFoundResource();
         return null;
@@ -74,9 +74,9 @@ public class UserService : IUserService
 
     public async Task<UserDto?> GetByEmail(string email)
     {
-        var getUser = await _userRepository.GetByEmail(email);
-        if (getUser != null)
-            return _mapper.Map<UserDto>(getUser);
+        var user = await _userRepository.GetByEmail(email);
+        if (user != null)
+            return _mapper.Map<UserDto>(user);
 
         _notificator.HandleNotFoundResource();
         return null;
@@ -84,71 +84,55 @@ public class UserService : IUserService
 
     public async Task<List<UserDto>> GetAll()
     {
-        var getUserList = await _userRepository.GetAll();
-        return _mapper.Map<List<UserDto>>(getUserList);
+        var users = await _userRepository.GetAll();
+        return _mapper.Map<List<UserDto>>(users);
     }
 
-    private async Task<bool> ValidationsToCreateUser(CreateUserDto dto)
+    private async Task<bool> ValidationsToCreate(CreateUserDto dto)
     {
         var user = _mapper.Map<User>(dto);
-        var userValidator = new ValidatorToCreateUser();
+        var validator = new UserValidator();
 
-        var validationResult = await userValidator.ValidateAsync(user);
+        var validationResult = await validator.ValidateAsync(user);
         if (!validationResult.IsValid)
         {
             _notificator.Handle(validationResult.Errors);
             return false;
         }
 
-        var existingUserByEmail = await _userRepository.GetByEmail(user.Email);
-        if (existingUserByEmail != null)
+        var userExist = await _userRepository.GetByEmail(user.Email);
+        if (userExist != null)
         {
-            _notificator.Handle("Já existe um usuário cadastrado com o email informado.");
+            _notificator.Handle("There is already a registered user with the email provided");
             return false;
         }
 
         return true;
     }
 
-    private async Task<bool> ValidationsToUpdateUser(int id, UpdateUserDto dto)
+    private async Task<bool> ValidationsToUpdate(int id, UpdateUserDto dto)
     {
-        var existingUserById = await _userRepository.GetById(id);
-        if (existingUserById == null)
+        var userExist = await _userRepository.GetById(id);
+        if (userExist == null)
         {
             _notificator.HandleNotFoundResource();
             return false;
         }
 
         var user = _mapper.Map<User>(dto);
-        var userValidator = new ValidatorToUpdateUser();
+        var validator = new UserValidator();
 
-        var validationResult = await userValidator.ValidateAsync(user);
+        var validationResult = await validator.ValidateAsync(user);
         if (!validationResult.IsValid)
         {
             _notificator.Handle(validationResult.Errors);
             return false;
         }
 
-        if (!string.IsNullOrEmpty(user.Email))
-        {
-            var existingUserByEmail = await _userRepository.GetByEmail(user.Email);
-            if (existingUserByEmail != null)
-            {
-                _notificator.Handle("Já existe um usuário cadastrado com o email informado.");
-                return false;
-            }
-        }
-
-        if (string.IsNullOrEmpty(user.Name) && string.IsNullOrEmpty(user.Email) && string.IsNullOrEmpty(user.Password))
-        {
-            _notificator.Handle("Nenhum campo fornecido para atualização.");
-            return false;
-        }
-
         return true;
     }
 
-    private void MappingToUpdateUser(User user, UpdateUserDto dto)
+    private void MappingToUpdate(User user, UpdateUserDto dto)
     {
         if (!string.IsNullOrEmpty(dto.Name))
             user.Name = dto.Name;
@@ -168,7 +152,7 @@ public class UserService : IUserService
         if (await _userRepository.UnitOfWork.Commit())
             return true;
 
-        _notificator.Handle("Ocorreu um erro ao salvar as alterações.");
+        _notificator.Handle("An error occurred while saving changes");
         return false;
     }
 }

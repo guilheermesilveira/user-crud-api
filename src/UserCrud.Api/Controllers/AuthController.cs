@@ -17,7 +17,7 @@ public class AuthController : MainController
     }
 
     [HttpPost]
-    [SwaggerOperation(Summary = "Login.", Tags = new[] { "Autenticação" })]
+    [SwaggerOperation(Summary = "Auth", Tags = new[] { "Authentication" })]
     [ProducesResponseType(typeof(TokenDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     public IActionResult Login([FromBody] LoginDto dto)

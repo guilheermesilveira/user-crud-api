@@ -19,30 +19,30 @@ public class UserController : MainController
     }
 
     [HttpPost]
-    [SwaggerOperation(Summary = "Criar um usuário.", Tags = new[] { "Administração - Usuários" })]
+    [SwaggerOperation(Summary = "Create a new user", Tags = new[] { "Users" })]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
     {
-        var createUser = await _userService.Create(dto);
-        return CustomResponse(createUser);
+        var user = await _userService.Create(dto);
+        return CustomResponse(user);
     }
 
     [HttpPut("{id}")]
-    [SwaggerOperation(Summary = "Atualizar um usuário.", Tags = new[] { "Administração - Usuários" })]
+    [SwaggerOperation(Summary = "Update a user", Tags = new[] { "Users" })]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto dto)
     {
-        var updateUser = await _userService.Update(id, dto);
-        return CustomResponse(updateUser);
+        var user = await _userService.Update(id, dto);
+        return CustomResponse(user);
     }
 
     [HttpDelete("{id}")]
-    [SwaggerOperation(Summary = "Deletar um usuário.", Tags = new[] { "Administração - Usuários" })]
+    [SwaggerOperation(Summary = "Delete a user", Tags = new[] { "Users" })]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
@@ -52,35 +52,35 @@ public class UserController : MainController
         return CustomResponse();
     }
 
-    [HttpGet("Obter-Por-Id/{id}")]
-    [SwaggerOperation(Summary = "Obter um usuário pelo id.", Tags = new[] { "Administração - Usuários" })]
+    [HttpGet("get-by-id/{id}")]
+    [SwaggerOperation(Summary = "Get a user by id", Tags = new[] { "Users" })]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(int id)
     {
-        var getUser = await _userService.GetById(id);
-        return CustomResponse(getUser);
+        var user = await _userService.GetById(id);
+        return CustomResponse(user);
     }
 
-    [HttpGet("Obter-Por-Email/{email}")]
-    [SwaggerOperation(Summary = "Obter um usuário pelo email.", Tags = new[] { "Administração - Usuários" })]
+    [HttpGet("get-by-email/{email}")]
+    [SwaggerOperation(Summary = "Get a user by email", Tags = new[] { "Users" })]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetByEmail(string email)
     {
-        var getUser = await _userService.GetByEmail(email);
-        return CustomResponse(getUser);
+        var user = await _userService.GetByEmail(email);
+        return CustomResponse(user);
     }
 
-    [HttpGet("Obter-Todos")]
-    [SwaggerOperation(Summary = "Obter todos os usuários.", Tags = new[] { "Administração - Usuários" })]
+    [HttpGet("get-all")]
+    [SwaggerOperation(Summary = "Get all users", Tags = new[] { "Users" })]
     [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetAll()
     {
-        var getUserList = await _userService.GetAll();
-        return CustomResponse(getUserList);
+        var users = await _userService.GetAll();
+        return CustomResponse(users);
     }
 }
