@@ -43,8 +43,11 @@ public class UserService : IUserService
             return null;
 
         var user = await _userRepository.GetById(id);
-        MappingToUpdate(user!, dto);
-        _userRepository.Update(user!);
+        user!.Name = dto.Name;
+        user.Email = dto.Email;
+        user.Password = dto.Password;
+        user.Password = _passwordHasher.HashPassword(user, dto.Password);
+        _userRepository.Update(user);
 
         return await CommitChanges() ? _mapper.Map<UserDto>(user) : null;
     }
@@ -112,6 +115,12 @@ public class UserService : IUserService
 
     private async Task<bool> ValidationsToUpdate(int id, UpdateUserDto dto)
     {
+        if (id != dto.Id)
+        {
+            _notificator.Handle("The ID given to the URL must be the same as the ID given in the JSON");
+            return false;
+        }
+
         var userExist = await _userRepository.GetById(id);
         if (userExist == null)
         {
@@ -130,21 +139,6 @@ public class UserService : IUserService
         }
 
         return true;
-    }
-
-    private void MappingToUpdate(User user, UpdateUserDto dto)
-    {
-        if (!string.IsNullOrEmpty(dto.Name))
-            user.Name = dto.Name;
-
-        if (!string.IsNullOrEmpty(dto.Email))
-            user.Email = dto.Email;
-
-        if (!string.IsNullOrEmpty(dto.Password))
-        {
-            user.Password = dto.Password;
-            user.Password = _passwordHasher.HashPassword(user, dto.Password);
-        }
     }
 
     private async Task<bool> CommitChanges()
